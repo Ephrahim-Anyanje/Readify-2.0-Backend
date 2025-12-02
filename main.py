@@ -5,12 +5,12 @@ import models  # ensure this imports your models module so Base is defined
 from database import engine, Base
 from routers import users, books, activity
 
-# Create tables if they don't exist
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Readify API")
 
-# CORS: allow your React dev server origin (change in production)
+
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["http://localhost:5173", "http://localhost:3000", "*"],  # update to more specific origins in prod

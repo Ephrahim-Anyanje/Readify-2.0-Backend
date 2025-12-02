@@ -1,5 +1,6 @@
 # google_books.py
-import os, requests
+import os
+import requests
 from dotenv import load_dotenv
 load_dotenv()
 API_KEY = os.getenv("GOOGLE_BOOKS_API_KEY", "").strip()

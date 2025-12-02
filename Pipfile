@@ -7,9 +7,9 @@ name = "pypi"
 fastapi = "*"
 uvicorn = "*"
 sqlalchemy = "*"
-python-dotenv = "*"
 requests = "*"
 pydantic = "*"
+python-dotenv = "*"
 
 [dev-packages]
 

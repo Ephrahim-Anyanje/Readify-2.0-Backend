@@ -6,13 +6,17 @@ from typing import Optional
 class UserCreate(BaseModel):
     username: str
     email: Optional[str] = None
+    password: str
+    full_name: Optional[str] = None
 
 class UserOut(BaseModel):
     id: int
     username: str
     email: Optional[str] = None
+    full_name: Optional[str] = None
+    
     class Config:
-        orm_mode = True
+        from_attributes = True  # Updated from orm_mode in Pydantic v2
 
 # Book
 class BookBase(BaseModel):
@@ -25,14 +29,14 @@ class BookBase(BaseModel):
 
 class BookCreate(BaseModel):
     title: str
-    author: str
-    description: str = None
-
+    author: Optional[str] = None
+    description: Optional[str] = None
 
 class BookOut(BookBase):
     id: int
+    
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Activity
 class ActivityCreate(BaseModel):
@@ -46,5 +50,6 @@ class ActivityOut(BaseModel):
     status: str
     progress: int
     book: BookOut
+    
     class Config:
-        orm_mode = True
+        from_attributes = True

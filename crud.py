@@ -1,65 +1,66 @@
-# crud.py
+from typing import Optional
 from sqlalchemy.orm import Session
-import models
+from models import User, Book, Activity
+from schemas import UserCreate, BookCreate
 
-# USERS
-def create_user(db: Session, username: str, email: str | None = None):
-    user = models.User(username=username, email=email)
-    db.add(user)
-    db.commit()
-    db.refresh(user)
-    return user
 
-def get_user(db: Session, username: str):
-    return db.query(models.User).filter(models.User.username == username).first()
-
-# BOOKS
-def get_book_by_external_id(db: Session, external_id: str):
-    return db.query(models.Book).filter(models.Book.external_id == external_id).first()
-
-def get_book(db: Session, book_id: int):
-    return db.query(models.Book).filter(models.Book.id == book_id).first()
-
-def get_or_create_book(db: Session, data: dict):
-    if data.get("external_id"):
-        existing = get_book_by_external_id(db, data["external_id"])
-        if existing:
-            return existing
-    book = models.Book(
-        title=data.get("title"),
-        author=data.get("author"),
-        description=data.get("description"),
-        cover_image=data.get("cover_image"),
-        category=data.get("category"),
-        external_id=data.get("external_id")
+# USER CRUD
+def create_user(db: Session, user: UserCreate):
+    new_user = User(
+        username=user.username,
+        email=user.email
     )
-    db.add(book)
+    db.add(new_user)
     db.commit()
-    db.refresh(book)
-    return book
+    db.refresh(new_user)
+    return new_user
 
-def list_books(db: Session):
-    return db.query(models.Book).order_by(models.Book.title).all()
 
-# ACTIVITY
-def create_activity(db: Session, user: models.User, book: models.Book, status: str, progress: int = 0):
-    act = models.ReadingActivity(user_id=user.id, book_id=book.id, status=status, progress=progress)
-    db.add(act)
+def get_user_by_id(db: Session, user_id: int):
+    return db.query(User).filter(User.id == user_id).first()
+
+
+def get_user_by_username(db: Session, username: str):
+    return db.query(User).filter(User.username == username).first()
+
+
+def get_all_users(db: Session):
+    return db.query(User).all()
+
+# BOOK CRUD
+def create_book(db: Session, book: BookCreate, owner_id: int):
+    new_book = Book(
+        title=book.title,
+        author=book.author,
+        google_id=book.google_id,
+        owner_id=owner_id
+    )
+    db.add(new_book)
     db.commit()
-    db.refresh(act)
-    return act
+    db.refresh(new_book)
+    return new_book
 
-def get_user_activities(db: Session, user: models.User):
-    return db.query(models.ReadingActivity).filter(models.ReadingActivity.user_id == user.id).all()
 
-def update_activity(db: Session, activity_id: int, status: str | None = None, progress: int | None = None):
-    act = db.query(models.ReadingActivity).filter(models.ReadingActivity.id == activity_id).first()
-    if not act:
-        return None
-    if status:
-        act.status = status
-    if progress is not None:
-        act.progress = progress
+def get_book_by_google_id(db: Session, google_id: str):
+    return db.query(Book).filter(Book.google_id == google_id).first()
+
+
+def get_books_for_user(db: Session, user_id: int):
+    return db.query(Book).filter(Book.owner_id == user_id).all()
+
+
+# ACTIVITY CRUD
+def log_activity(db: Session, user_id: int, action: str, book_title: Optional[str] = None):
+    new_activity = Activity(
+        user_id=user_id,
+        action=action,
+        book_title=book_title,
+    )
+    db.add(new_activity)
     db.commit()
-    db.refresh(act)
-    return act
+    db.refresh(new_activity)
+    return new_activity
+
+
+def get_user_activity(db: Session, user_id: int):
+    return db.query(Activity).filter(Activity.user_id == user_id).all()

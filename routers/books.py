@@ -1,4 +1,5 @@
 # routers/books.py
+from typing import List
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from database import get_db
@@ -12,6 +13,6 @@ router = APIRouter(prefix="/books", tags=["books"])
 def search(q: str = Query(..., min_length=1), max_results: int = 8):
     return google_books.search_google_books(q, max_results=max_results)
 
-@router.get("/", response_model=list[schemas.BookOut])
+@router.get("/", response_model=List[schemas.BookOut])
 def list_books(db: Session = Depends(get_db)):
     return crud.list_books(db)

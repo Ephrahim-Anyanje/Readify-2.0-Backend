@@ -12,7 +12,13 @@ def create_user(user_in: schemas.UserCreate, db: Session = Depends(get_db)):
     existing = crud.get_user(db, user_in.username)
     if existing:
         raise HTTPException(status_code=400, detail="Username already exists")
-    return crud.create_user(db, user_in.username, user_in.email)
+
+    return crud.create_user(
+        db,
+        user_in.username,
+        user_in.email,
+        user_in.password
+    )
 
 @router.get("/{username}", response_model=schemas.UserOut)
 def get_user(username: str, db: Session = Depends(get_db)):

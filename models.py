@@ -22,7 +22,7 @@ class Book(Base):
     external_id = Column(String(128), unique=True, nullable=True, index=True)
     activities = relationship("ReadingActivity", back_populates="book", cascade="all, delete-orphan")
 
-class ReadingActivity(Base):
+class Activity(Base):
     __tablename__ = "reading_activity"
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)

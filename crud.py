@@ -6,11 +6,13 @@ from schemas import UserCreate, BookCreate
 from passlib.context import CryptContext
 
 # Password hashing configuration
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
 
 def hash_password(password: str) -> str:
     """Hash a plain text password"""
-    return pwd_context.hash(password)
+    # Truncate password to 72 bytes as required by bcrypt
+    truncated_password = password.encode('utf-8')[:72].decode('utf-8')
+    return pwd_context.hash(truncated_password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
     """Verify a plain text password against a hashed password"""
@@ -87,7 +89,10 @@ def create_book(db: Session, book: BookCreate, owner_id: int = None) -> Book:
     new_book = Book(
         title=book.title,
         author=book.author,
-        description=book.description
+        description=book.description,
+        cover_image=book.cover_image,
+        category=book.category,
+        external_id=book.external_id
     )
     db.add(new_book)
     db.commit()
@@ -136,7 +141,8 @@ def create_activity(
         user_id=user.id,
         book_id=book.id,
         status=status,
-        progress=progress
+        progress=progress,
+        is_favorite=0
     )
     db.add(new_activity)
     db.commit()
@@ -158,7 +164,8 @@ def update_activity(
     db: Session, 
     activity_id: int, 
     status: Optional[str] = None, 
-    progress: Optional[int] = None
+    progress: Optional[int] = None,
+    is_favorite: Optional[bool] = None
 ) -> Optional[Activity]:
     """Update an activity"""
     activity = db.query(Activity).filter(Activity.id == activity_id).first()
@@ -167,6 +174,15 @@ def update_activity(
             activity.status = status
         if progress is not None:
             activity.progress = progress
+        if is_favorite is not None:
+            activity.is_favorite = 1 if is_favorite else 0
         db.commit()
         db.refresh(activity)
     return activity
+
+def get_activity_by_book_and_user(db: Session, book_id: int, user_id: int) -> Optional[Activity]:
+    """Get activity for a specific book and user"""
+    return db.query(Activity).filter(
+        Activity.book_id == book_id,
+        Activity.user_id == user_id
+    ).first()

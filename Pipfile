@@ -10,6 +10,8 @@ sqlalchemy = "*"
 requests = "*"
 pydantic = "*"
 python-dotenv = "*"
+passlib = "*"
+bcrypt = "*"
 
 [dev-packages]
 

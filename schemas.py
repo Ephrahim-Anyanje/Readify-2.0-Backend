@@ -36,6 +36,9 @@ class BookCreate(BaseModel):
     title: str
     author: Optional[str] = None
     description: Optional[str] = None
+    cover_image: Optional[str] = None
+    category: Optional[str] = None
+    external_id: Optional[str] = None
 
 class BookOut(BookBase):
     id: int
@@ -50,10 +53,16 @@ class ActivityCreate(BaseModel):
     status: str
     progress: int = 0
 
+class ActivityUpdate(BaseModel):
+    status: Optional[str] = None
+    progress: Optional[int] = None
+    is_favorite: Optional[bool] = None
+
 class ActivityOut(BaseModel):
     id: int
     status: str
     progress: int
+    is_favorite: bool = False
     book: BookOut
     
     class Config:

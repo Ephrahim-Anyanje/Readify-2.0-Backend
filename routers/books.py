@@ -35,11 +35,31 @@ def list_books(db: Session = Depends(get_db)):
     return crud.list_books(db)
 
 
+@router.get("/my-books", response_model=List[schemas.BookOut])
+def get_my_books(username: str = Query(..., description="Username"), db: Session = Depends(get_db)):
+    """
+    Get all books for a specific user (through activities)
+    """
+    user = crud.get_user_by_username(db, username)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found"
+        )
+    return crud.get_books_for_user(db, user.id)
+
+
 @router.post("/", response_model=schemas.BookOut, status_code=status.HTTP_201_CREATED)
 def create_book(book: schemas.BookCreate, db: Session = Depends(get_db)):
     """
     Add a new book to the database
     """
+    # Check if book with same external_id already exists
+    if book.external_id:
+        existing = crud.get_book_by_google_id(db, book.external_id)
+        if existing:
+            return existing
+    
     return crud.create_book(db, book)
 
 

@@ -36,6 +36,7 @@ class Activity(Base):
     book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
     status = Column(String(64), nullable=False, default="wishlist")
     progress = Column(Integer, nullable=True, default=0)
+    is_favorite = Column(Integer, default=0)  # 0 = false, 1 = true
     date_added = Column(DateTime, default=datetime.utcnow)
 
     user = relationship("User", back_populates="activities")

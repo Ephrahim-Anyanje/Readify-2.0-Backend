@@ -1,5 +1,6 @@
 # routers/users.py
 from fastapi import APIRouter, Depends, HTTPException, status
+from typing import List
 from sqlalchemy.orm import Session
 from database import get_db
 import crud
@@ -86,7 +87,7 @@ def update_user(
     return user
 
 
-@router.get("/", response_model=list[schemas.UserOut])
+@router.get("/", response_model=List[schemas.UserOut])
 def list_users(db: Session = Depends(get_db)):
     """
     List all users (for admin purposes)
